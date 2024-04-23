@@ -1,5 +1,6 @@
 import numpy as np
 import plot
+import composite
 import re
 import xml.dom.minidom as dom
 import argparse
@@ -37,11 +38,14 @@ def generateSVG(plot):
 
     composite_group = document.createElement('g')
     legend = document.createElement('g')
-    legend.setAttribute("transform", "translate(" + str(plot.width - plot.margins.right + 25) + " " + plot.margins.top + ")")
+    legend.setAttribute("transform", "translate(" + str(plot.width - plot.margins.get("right") + 25) + " " + str(plot.margins.get("top")) + ")")
 
     group.appendChild(title)
     group.appendChild(xlabel)
     group.appendChild(ylabel)
+
+    c = composite.parseComposite("sample.out")
+    group.appendChild(plot.plot_composite(c.xmin, c.xmax, c.sense, c.anti, scale=30, color="#FF0000", secondary_color="#0000FF"))
 
     template = open("template.xml", "r").read()
     with open("out.xml", 'w') as f:
@@ -50,7 +54,7 @@ def generateSVG(plot):
         f.write("</svg>")
 
 def main():
-    p = plot.Plot(xlabel="ok")
+    p = plot.Plot(combined=True)
     generateSVG(p)
 
 if __name__ == "__main__":
